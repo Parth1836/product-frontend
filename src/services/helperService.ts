@@ -1,4 +1,5 @@
 import axios from "axios";
+import CryptoJS from "crypto-js";
 import { ProductAPIData } from "../types/product";
 import { UserLogin, UserRegister } from "../types/user";
 
@@ -45,22 +46,41 @@ const serverApi = async (url: string, methodType: string, data: any = null) => {
   }
 };
 
+//encrypting password
+const encryptPasswordAES = (password: string) => {
+  const secretKey = "PARTH_SECRETS"; // Store this securely!
+  return CryptoJS.AES.encrypt(password, secretKey).toString();
+};
+
 // method to call login api
 export const loginApi = async (data: UserLogin) => {
+  const encryptedPassword = encryptPasswordAES(data?.password);
+  const loginPayload: UserLogin = {
+    userEmail: data.userEmail,
+    password: encryptedPassword,
+  };
+
   const response = await serverApi(
     "http://localhost:8080/api/login",
     "POST",
-    data
+    loginPayload
   );
   return response;
 };
 
 // method to call regiser api
 export const registerApi = async (data: UserRegister) => {
+  const encryptedPassword = encryptPasswordAES(data?.password);
+  const registerPayload: UserRegister = {
+    firstName: data.firstName,
+    lastName: data.lastName,
+    userEmail: data.userEmail,
+    password: encryptedPassword,
+  };
   const response = await serverApi(
     "http://localhost:8080/api/register",
     "POST",
-    data
+    registerPayload
   );
   return response;
 };

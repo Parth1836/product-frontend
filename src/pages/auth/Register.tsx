@@ -11,6 +11,7 @@ import { registerApi } from "../../services/helperService";
 import { setUser } from "../../store/slices/userSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "@mui/material";
+import { ERROR_MESSAGE, ERROR_TYPE } from "../../constants/clientConstants";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -29,6 +30,13 @@ const Register = () => {
     passwordError: "",
   });
 
+  // validate the email pattern
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // setting the register when user types
   const handleInputChange = (type: string, value: string) => {
     setRegisterForm((prev: any) => {
       prev[type] = value;
@@ -36,28 +44,38 @@ const Register = () => {
     });
   };
 
+  // api call for register user
   const handleRegister = async () => {
     try {
+      setError((prevErr) => {
+        const error = prevErr;
+        error.firstNameError =
+          registerForm.firstName?.length === 0
+            ? ERROR_MESSAGE.FIRST_NAME_MANDATORY
+            : "";
+        error.lastNameError =
+          registerForm.lastName?.length === 0
+            ? ERROR_MESSAGE.LAST_NAME_MANDATORY
+            : "";
+        error.userEmailError =
+          registerForm.userEmail?.length === 0
+            ? ERROR_MESSAGE.EMAIL_MANDATORY
+            : !validateEmail(registerForm.userEmail)
+            ? ERROR_MESSAGE.VALID_EMAIL
+            : "";
+        error.passwordError =
+          registerForm.password?.length === 0
+            ? ERROR_MESSAGE.PASSWORD_MANDATORY
+            : "";
+        return { ...error };
+      });
       if (
         !registerForm.firstName ||
         !registerForm.lastName ||
         !registerForm.userEmail ||
-        !registerForm.password
+        !registerForm.password ||
+        !validateEmail(registerForm.userEmail)
       ) {
-        setError((prevErr) => {
-          const error = prevErr;
-          error.firstNameError =
-            registerForm.firstName?.length === 0
-              ? "First Name is mandatory"
-              : "";
-          error.lastNameError =
-            registerForm.lastName?.length === 0 ? "Last Name is mandatory" : "";
-          error.userEmailError =
-            registerForm.userEmail?.length === 0 ? "Email is mandatory" : "";
-          error.passwordError =
-            registerForm.password?.length === 0 ? "Password is mandatory" : "";
-          return { ...error };
-        });
         return;
       }
       const userPayload = {
@@ -71,6 +89,15 @@ const Register = () => {
         localStorage.setItem("token", data.token);
         dispatch(setUser({ userName: data.userName, userId: data?.id }));
         navigate("/home");
+      } else if (
+        data.error &&
+        data.message === ERROR_TYPE.USER_ALREADY_EXISTS
+      ) {
+        setError((prevErr) => {
+          const error = prevErr;
+          error.userEmailError = ERROR_MESSAGE.EMAIL_ALREADY_EXISTS;
+          return { ...error };
+        });
       }
     } catch (error) {
       console.log("error", error);
@@ -156,10 +183,7 @@ const Register = () => {
             </FormHelperText>
           ) : null}
         </FormControl>
-        <Button
-          sx={{ mt: 1 }}
-          onClick={handleRegister}
-        >
+        <Button sx={{ mt: 1 }} onClick={handleRegister}>
           Register
         </Button>
         <Typography
