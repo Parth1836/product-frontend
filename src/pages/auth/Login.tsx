@@ -91,7 +91,7 @@ const Login = () => {
           <Typography level="body-sm">Sign in to continue.</Typography>
         </div>
         <FormControl>
-          <FormLabel>Email</FormLabel>
+          <FormLabel>Email  <span style={{ color: "red" }}>*</span></FormLabel>
           <Input
             name="userEmail"
             type="email"
@@ -106,7 +106,7 @@ const Login = () => {
           ) : null}
         </FormControl>
         <FormControl>
-          <FormLabel>Password</FormLabel>
+          <FormLabel>Password <span style={{ color: "red" }}>*</span></FormLabel>
           <Input
             name="password"
             type="password"

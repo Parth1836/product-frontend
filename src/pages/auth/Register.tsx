@@ -128,7 +128,7 @@ const Register = () => {
           <Typography level="body-sm">Create a new account.</Typography>
         </div>
         <FormControl>
-          <FormLabel>First Name</FormLabel>
+          <FormLabel>First Name  <span style={{ color: "red" }}>*</span></FormLabel>
           <Input
             name="firstName"
             type="text"
@@ -142,7 +142,7 @@ const Register = () => {
           ) : null}
         </FormControl>
         <FormControl>
-          <FormLabel>Last Name</FormLabel>
+          <FormLabel>Last Name  <span style={{ color: "red" }}>*</span></FormLabel>
           <Input
             name="lastName"
             type="text"
@@ -156,7 +156,7 @@ const Register = () => {
           ) : null}
         </FormControl>
         <FormControl>
-          <FormLabel>Email</FormLabel>
+          <FormLabel>Email  <span style={{ color: "red" }}>*</span></FormLabel>
           <Input
             name="userEmail"
             type="email"
@@ -170,7 +170,7 @@ const Register = () => {
           ) : null}
         </FormControl>
         <FormControl>
-          <FormLabel>Password</FormLabel>
+          <FormLabel>Password  <span style={{ color: "red" }}>*</span></FormLabel>
           <Input
             name="password"
             type="password"
