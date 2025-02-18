@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { loginApi } from "../../services/helperService";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/slices/userSlice";
+import { ERROR_MESSAGE } from "../../constants/clientConstants";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -34,15 +35,20 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      if(!userForm.userEmail || !userForm.password) {
-        setError((prevErr) => {
-          const error = prevErr;
-          error.userEmailError = userForm.userEmail?.length === 0 ? "Email is mandatory" : "";
-          error.userPasswordError = userForm.password?.length === 0 ? "Password is mandatory" : "";
-          return { ...error };
-        });
+      setError((prevErr) => {
+        const error = prevErr;
+        error.userEmailError =
+          userForm.userEmail?.length === 0 ? ERROR_MESSAGE.EMAIL_MANDATORY : "";
+        error.userPasswordError =
+          userForm.password?.length === 0
+            ? ERROR_MESSAGE.PASSWORD_MANDATORY
+            : "";
+        return { ...error };
+      });
+      if (!userForm.userEmail || !userForm.password) {
         return;
       }
+
       const data = await loginApi({
         userEmail: userForm.userEmail,
         password: userForm.password,
@@ -55,7 +61,7 @@ const Login = () => {
     } catch (error) {
       setError((prevErr) => {
         const error = prevErr;
-        error.invalidPasswordError = "Invalid username and password";
+        error.invalidPasswordError = ERROR_MESSAGE.INVALID_EMAIL_PASSWORD;
         return { ...error };
       });
     }
@@ -114,6 +120,11 @@ const Login = () => {
             </FormHelperText>
           ) : null}
         </FormControl>
+        {error.invalidPasswordError?.length ? (
+            <FormHelperText sx={{ color: "red" }}>
+              {error.invalidPasswordError}
+            </FormHelperText>
+          ) : null}
         <Button sx={{ mt: 1 }} onClick={handleLogin}>
           Log in
         </Button>
